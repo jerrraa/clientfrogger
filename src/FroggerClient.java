@@ -45,9 +45,14 @@ public class FroggerClient extends JFrame implements KeyListener {
 	private JLabel LifeText, ScoreText;
 	private int lifes = 3;
 	private int score = 50;
-	
 	private int xreset = 400;
 	private int yreset = 914;
+	
+	private int CLIENT_PORT = 5656;
+	private int SERVER_PORT = 5556;
+	
+	private OutputStream outstream;
+	private PrintWriter out;
 	
 	public static void main(String[] args) throws IOException {
 		FroggerClient game = new FroggerClient();
@@ -57,10 +62,6 @@ public class FroggerClient extends JFrame implements KeyListener {
 	
 	public FroggerClient() throws IOException {
 
-		DisplayScreen();
-		
-		final int CLIENT_PORT = 5656;
-		final int SERVER_PORT = 5556;	
 		final ServerSocket client = new ServerSocket(CLIENT_PORT);
 				
 		//set up listening server
@@ -73,7 +74,7 @@ public class FroggerClient extends JFrame implements KeyListener {
 						Socket s2;
 						try {
 							s2 = client.accept();
-							GameClient myService = new GameClient (s2);
+							GameClient myService = new GameClient(s2);
 							Thread t = new Thread(myService);
 							t.start();
 							
@@ -82,8 +83,8 @@ public class FroggerClient extends JFrame implements KeyListener {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						System.out.println("client connected");
-						
+						System.out.println ("Client connected! On port: "+SERVER_PORT);
+						DisplayScreen();
 					}
 
 				}
@@ -93,8 +94,8 @@ public class FroggerClient extends JFrame implements KeyListener {
 
 		//set up a communication socket
 		Socket s = new Socket("localhost", SERVER_PORT);
-		
-		
+		outstream = s.getOutputStream();
+		out = new PrintWriter(outstream);
 		
 		
 
@@ -177,15 +178,15 @@ public class FroggerClient extends JFrame implements KeyListener {
 				//insert all functions
 				add(LifeText);
 				add(ScoreText);
-				//InsertVehicleRows();
-				//InsertVehicleRows1();
-				//InsertVehicleRows2();
+				InsertVehicleRows();
+				InsertVehicleRows1();
+				InsertVehicleRows2();
 				add(frog1Label);
-				//InsertLogRows();
-				//InsertLogRows2();
-				//InsertLogRows3();
-				//InsertLogRows4();
-				//InsertLogRows5();
+				InsertLogRows();
+				InsertLogRows2();
+				InsertLogRows3();
+				InsertLogRows4();
+				InsertLogRows5();
 				//ThreadForLanes();
 				add(Backgroundlab);
 				//user input
@@ -228,29 +229,201 @@ public class FroggerClient extends JFrame implements KeyListener {
 		int x = frog1.getX(); int y = frog1.getY();
 		if (frog1.getMoving() == true) {
 		//modify position
+		String command;
 		if (e.getKeyCode() == KeyEvent.VK_UP) {
-			y -= Gameproperties.CHARACTER_STEP;
-
+			command = "PLAYER UP";
+			System.out.println("Sending: " + command);
+			out.println(command);
+			out.flush();
+				
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-			y += Gameproperties.CHARACTER_STEP;
+			command = "PLAYER DOWN";
+			System.out.println("Sending: " + command);
+			out.println(command);
+			out.flush();
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			x -= Gameproperties.CHARACTER_STEP-49;
+			command = "PLAYER LEFT";
+			System.out.println("Sending: " + command);
+			out.println(command);
+			out.flush();
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			x += Gameproperties.CHARACTER_STEP-49;
+			command = "PLAYER RIGHT";
+			System.out.println("Sending: " + command);
+			out.println(command);
+			out.flush();
 		} else {
 			System.out.println("invalid operation");
 		}
-		//check if it reaches out of bounds
-		DetectBorder(x, y);
-		frog1Label.setLocation(frog1.getX(), frog1.getY());
-		//a function in frog1 class to check if it interacts with top grass
-		frog1.CheckforTop();
-		}
 	}
+}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
+		
+	}
+	public void InsertVehicleRows() {
+		vehiclelane = new Vehicle[4];
+		int Xoffset = 0;
+		for (int i = 0; i<4; i++ ) {
+			vehiclelane[i] = new Vehicle();
+			VEHICLElabel = new JLabel(); 
+			VEHICLElabel.setIcon(vehicleicon);
+			VEHICLElabel.setSize(widthveh, heightveh);
+			
+			vehiclelane[i].SetVehicleLabel(VEHICLElabel);
+			vehiclelane[i].setHeight(heightveh); vehiclelane[i].setWidth(widthveh);
+			vehiclelane[i].setX(vehiclelane[i].getX() + Xoffset);
+			vehiclelane[i].setY(710);
+			vehiclelane[i].SetSpeed(Gameproperties.CHARACTER_STEP-60);
+			VEHICLElabel.setLocation(vehiclelane[i].getX(), vehiclelane[i].getY());
+			
+			add(VEHICLElabel);
+			Xoffset += offset-20;
+		}
+	}
+	//this belongs to top row
+	public void InsertVehicleRows1(){
+		vehiclelane1 = new ReverseVehicle[4];
+		int Xoffset = 0;
+		for (int i = 0; i<4; i++ ) {
+			vehiclelane1[i] = new ReverseVehicle();
+			VEHICLElabel2 = new JLabel(); 
+			VEHICLElabel2.setIcon(vehicleicon2);
+			VEHICLElabel2.setSize(widthveh, heightveh);
+			vehiclelane1[i].SetVehicleLabel(VEHICLElabel2);
+			vehiclelane1[i].setHeight(heightveh); vehiclelane1[i].setWidth(widthveh);
+			vehiclelane1[i].setX(vehiclelane1[i].getX() + Xoffset);
+			vehiclelane1[i].setY(620);
+			vehiclelane1[i].SetSpeed(Gameproperties.CHARACTER_STEP-80);
+			VEHICLElabel2.setLocation(vehiclelane1[i].getX(), vehiclelane1[i].getY());
+			add(VEHICLElabel2);
+			Xoffset += offset+20;
+		}
+	}
+	//this belongs to bottom row
+	public void InsertVehicleRows2(){
+		vehiclelane2 = new Vehicle[4];
+		int Xoffset = 0;
+		for (int i = 0; i<4; i++ ) {
+			vehiclelane2[i] = new Vehicle();
+			vehiclelane2[i].GrabFrog1(frog1);
+			vehiclelane2[i].GrabGame(this);
+			VEHICLElabel3 = new JLabel(); 
+			VEHICLElabel3.setIcon(vehicleicon);
+			VEHICLElabel3.setSize(widthveh, heightveh);
+			vehiclelane2[i].SetVehicleLabel(VEHICLElabel3);
+			vehiclelane2[i].setHeight(heightveh); vehiclelane2[i].setWidth(widthveh);
+			vehiclelane2[i].setX(vehiclelane2[i].getX() + Xoffset);
+			vehiclelane2[i].setY(800);
+			vehiclelane2[i].SetSpeed(Gameproperties.CHARACTER_STEP-40);
+			VEHICLElabel3.setLocation(vehiclelane2[i].getX(), vehiclelane2[i].getY());
+			add(VEHICLElabel3);
+			Xoffset += offset+50;
+		}
+	}
+	public void InsertLogRows() {
+		LogLane = new Log[4];
+		int Loffset = 0;
+		for (int i = 0; i<4; i++) {
+			LogLane[i] = new Log();
+			LOGlabel = new JLabel();
+			LOGlabel.setIcon(logicon);
+			LOGlabel.setSize(200, 80);
+			LogLane[i].setHeight(90);
+			LogLane[i].setWidth(160);
+			LogLane[i].setX(LogLane[i].getX() + Loffset+70);
+			LogLane[i].setY(454);
+			LogLane[i].SetSpeed(19);
+			LogLane[i].setDirection(true);
+			LOGlabel.setLocation(LogLane[i].getX(), LogLane[i].getY());
+			LogLane[i].SetLogLabel(LOGlabel);
+			add(LOGlabel);
+			Loffset += offset+80;
+		}
+	}
+	public void InsertLogRows2() {
+		LogLane1 = new Log[4];
+		int Loffset = 0;
+		for (int i = 0; i<4; i++) {
+			LogLane1[i] = new Log();
+			LOGlabel2 = new JLabel();
+			LOGlabel2.setIcon(logicon);
+			LOGlabel2.setSize(200, 80);
+			LogLane1[i].setHeight(95);
+			LogLane1[i].setWidth(160);
+			LogLane1[i].setX(LogLane1[i].getX() + Loffset);
+			LogLane1[i].setY(364);
+			LogLane1[i].SetSpeed(15);
+			LOGlabel2.setLocation(LogLane1[i].getX(), LogLane1[i].getY());
+			LogLane1[i].SetLogLabel(LOGlabel2);
+			add(LOGlabel2);
+			Loffset += offset+80;
+		}
+	}
+	public void InsertLogRows3() {
+		LogLane2 = new Log[4];
+		int Loffset = 0;
+		for (int i = 0; i<4; i++) {
+			LogLane2[i] = new Log();
+			LOGlabel3 = new JLabel();
+			LOGlabel3.setIcon(logicon);
+			LOGlabel3.setSize(200, 80);
+			LogLane2[i].setHeight(95);
+			LogLane2[i].setWidth(160);
+			LogLane2[i].setX(LogLane2[i].getX() + Loffset-40);
+			LogLane2[i].setY(274);
+			LogLane2[i].SetSpeed(30);
+			LOGlabel3.setLocation(LogLane2[i].getX(), LogLane2[i].getY());
+			LogLane2[i].SetLogLabel(LOGlabel3);
+			add(LOGlabel3);
+			Loffset += offset+80;
+		}
+	}
+	public void InsertLogRows4() {
+		LogLane3 = new Log[4];
+		int Loffset = 0;
+		for (int i = 0; i<4; i++) {
+			LogLane3[i] = new Log();
+			LOGlabel4 = new JLabel();
+			LOGlabel4.setIcon(logicon);
+			LOGlabel4.setSize(200, 80);
+			LogLane3[i].setHeight(95);
+			LogLane3[i].setWidth(160);
+			LogLane3[i].setDirection(true);
+			LogLane3[i].setX(LogLane3[i].getX() + Loffset+50);
+			LogLane3[i].setY(184);
+			LogLane3[i].SetSpeed(10);
+			
+			LOGlabel4.setLocation(LogLane3[i].getX(), LogLane3[i].getY());
+			LogLane3[i].SetLogLabel(LOGlabel4);
+			add(LOGlabel4);
+			Loffset += offset+80;
+		}
+	}
+	public void InsertLogRows5() {
+		LogLane4 = new Log[4];
+		int Loffset = 0;
+		for (int i = 0; i<4; i++) {
+			LogLane4[i] = new Log();
+			LOGlabel5 = new JLabel();
+			LOGlabel5.setIcon(logicon);
+			LOGlabel5.setSize(200, 80);
+			LogLane4[i].setHeight(95);
+			LogLane4[i].setWidth(160);
+			LogLane4[i].setX(LogLane4[i].getX() + Loffset);
+			LogLane4[i].setY(94);
+			LogLane4[i].SetSpeed(40);
+			LOGlabel5.setLocation(LogLane4[i].getX(), LogLane4[i].getY());
+			LogLane4[i].SetLogLabel(LOGlabel5);
+			add(LOGlabel5);
+			Loffset += offset+80;
+		}
+	}
+	public void UpdateFrog1(int playerX, int playerY) {
+		frog1.setX(playerX); frog1.setY(playerY);
+		DetectBorder(playerX,playerY);
+		frog1Label.setLocation(frog1.getX(), frog1.getY());
 		
 	}
 

@@ -44,6 +44,9 @@ public class Log extends Sprite {
 	public void StartMoving() {
 		this.moving = false;
 	}
+	public void UpdateLog(int vert, int hort, int speed) {
+		
+	}
 	public void detectLog() {
 		if (this.rect.intersects(frog1.rect)) {
 			if (GetDirection() == true) {
