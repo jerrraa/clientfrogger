@@ -46,9 +46,11 @@ public class GameClient implements Runnable{
 public void executeCommand(String command) throws IOException{
 		if ( command.equals("PLAYER")) {
 			FroggerClient game = new FroggerClient();
+			int playno = in.nextInt();
+			String input = in.next();
 			int playerX = in.nextInt();
 			int playerY = in.nextInt();
-			System.out.println("Player "+playerX+", "+playerY);
+			System.out.println("?SPlayer "+playno+" "+ input + " "+playerX+", "+playerY);
 			game.UpdateFrog1(playerX, playerY);
 		}
 	}

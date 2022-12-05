@@ -61,7 +61,7 @@ public class FroggerClient extends JFrame implements KeyListener {
 //connect and insert contents
 	
 	public FroggerClient() throws IOException {
-
+		DisplayScreen();
 		final ServerSocket client = new ServerSocket(CLIENT_PORT);
 				
 		//set up listening server
@@ -83,8 +83,6 @@ public class FroggerClient extends JFrame implements KeyListener {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						System.out.println ("Client connected! On port: "+SERVER_PORT);
-						DisplayScreen();
 					}
 
 				}
@@ -231,23 +229,23 @@ public class FroggerClient extends JFrame implements KeyListener {
 		//modify position
 		String command;
 		if (e.getKeyCode() == KeyEvent.VK_UP) {
-			command = "PLAYER UP";
+			command = "PLAYER 1 UP";
 			System.out.println("Sending: " + command);
 			out.println(command);
 			out.flush();
 				
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-			command = "PLAYER DOWN";
+			command = "PLAYER 1 DOWN";
 			System.out.println("Sending: " + command);
 			out.println(command);
 			out.flush();
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			command = "PLAYER LEFT";
+			command = "PLAYER 1 LEFT";
 			System.out.println("Sending: " + command);
 			out.println(command);
 			out.flush();
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			command = "PLAYER RIGHT";
+			command = "PLAYER 1 RIGHT";
 			System.out.println("Sending: " + command);
 			out.println(command);
 			out.flush();
