@@ -1,8 +1,10 @@
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class GameClient implements Runnable{
+//processing routine on server (B)
+public class GameClient implements Runnable {
 
 	private Socket s;
 	private Scanner in;
@@ -10,10 +12,8 @@ public class GameClient implements Runnable{
 	public GameClient (Socket aSocket) {
 		this.s = aSocket;
 	}
-	
-	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		
 		try {
 			in = new Scanner(s.getInputStream());
 			processRequest( );
@@ -26,8 +26,8 @@ public class GameClient implements Runnable{
 				e.printStackTrace();
 			}
 		}
-		
-	}
+			}
+	//processing the requests
 	public void processRequest () throws IOException {
 		//if next request is empty then return
 		while(true) {
@@ -42,18 +42,15 @@ public class GameClient implements Runnable{
 			}
 		}
 	}
-	
-public void executeCommand(String command) throws IOException{
-		if ( command.equals("PLAYER")) {
-			FroggerClient game = new FroggerClient();
-			int playno = in.nextInt();
-			String input = in.next();
-			int playerX = in.nextInt();
-			int playerY = in.nextInt();
-			System.out.println("?SPlayer "+playno+" "+ input + " "+playerX+", "+playerY);
-			game.UpdateFrog1(playerX, playerY);
+	public void executeCommand(String command) throws IOException{
+		if ( command.equals("VERT")) {
+			int speed = in.nextInt();
+			System.out.println("SOUP" + speed);
+			DataScore.INSTANCE.SetY(speed);
+		} else if (command.equals("SIDE")) {
+			int speed = in.nextInt();
+			System.out.println("PIZZA" + speed);
+			DataScore.INSTANCE.SetX(speed);
 		}
 	}
-	
-	
 }

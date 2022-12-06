@@ -14,7 +14,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 public class FroggerClient extends JFrame implements KeyListener {
-
+	
 	//
 	private Frog1 frog1;
 	private Container content;
@@ -48,12 +48,14 @@ public class FroggerClient extends JFrame implements KeyListener {
 	private int xreset = 400;
 	private int yreset = 914;
 	
-	private int CLIENT_PORT = 5656;
-	private int SERVER_PORT = 5556;
+	final static int CLIENT_PORT = 5656;
+	final static int SERVER_PORT = 5556;
 	
-	private OutputStream outstream;
-	private PrintWriter out;
-	
+	Socket s = new Socket("localhost", SERVER_PORT);
+	//Initialize data stream to send data out
+	OutputStream outstream = s.getOutputStream();
+	PrintWriter out = new PrintWriter(outstream);
+
 	public static void main(String[] args) throws IOException {
 		FroggerClient game = new FroggerClient();
 		game.setVisible(true);
@@ -62,41 +64,39 @@ public class FroggerClient extends JFrame implements KeyListener {
 	
 	public FroggerClient() throws IOException {
 		DisplayScreen();
-		final ServerSocket client = new ServerSocket(CLIENT_PORT);
-				
-		//set up listening server
-		Thread t1 = new Thread ( new Runnable () {
-			public void run ( ) {
-				synchronized(this) {
-					
-					System.out.println("Waiting for server responses...");
-					while(true) {
-						Socket s2;
-						try {
-							s2 = client.accept();
-							GameClient myService = new GameClient(s2);
-							Thread t = new Thread(myService);
-							t.start();
+			final ServerSocket client = new ServerSocket(CLIENT_PORT);
+			
+			
+			//set up listening server
+			Thread t1 = new Thread ( new Runnable () {
+				public void run ( ) {
+					synchronized(this) {
+						
+						System.out.println("Waiting for server responses...");
+						while(true) {
+							Socket s2;
+							try {
+								s2 = client.accept();
+								GameClient myService = new GameClient (s2);
+								Thread t = new Thread(myService);
+								t.start();
+								
+								
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							System.out.println("client connected");
 							
-							
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
+
+						
 					}
-
 				}
-			}
-		});
-		t1.start( );
+			});
+			t1.start( );
 
-		//set up a communication socket
-		Socket s = new Socket("localhost", SERVER_PORT);
-		outstream = s.getOutputStream();
-		out = new PrintWriter(outstream);
-		
-		
-
+			
 	}
 	public void Resetfrogger() throws IOException {
 		// add a life counter and update position
@@ -227,34 +227,24 @@ public class FroggerClient extends JFrame implements KeyListener {
 		int x = frog1.getX(); int y = frog1.getY();
 		if (frog1.getMoving() == true) {
 		//modify position
-		String command;
+		String command = null;
 		if (e.getKeyCode() == KeyEvent.VK_UP) {
-			command = "PLAYER 1 UP";
-			System.out.println("Sending: " + command);
-			out.println(command);
-			out.flush();
-				
+			command = "VERT 90";
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-			command = "PLAYER 1 DOWN";
-			System.out.println("Sending: " + command);
-			out.println(command);
-			out.flush();
+			command = "VERT 90";
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			command = "PLAYER 1 LEFT";
-			System.out.println("Sending: " + command);
-			out.println(command);
-			out.flush();
+			command = "SIDE 41";
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			command = "PLAYER 1 RIGHT";
-			System.out.println("Sending: " + command);
-			out.println(command);
-			out.flush();
+			command = "SIDE 41";
+
 		} else {
 			System.out.println("invalid operation");
 		}
-	}
+		out.println(command);
+		out.flush();
+		UpdateFrog1();
+		}
 }
-
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
@@ -418,10 +408,9 @@ public class FroggerClient extends JFrame implements KeyListener {
 			Loffset += offset+80;
 		}
 	}
-	public void UpdateFrog1(int playerX, int playerY) {
-		frog1.setX(playerX); frog1.setY(playerY);
-		DetectBorder(playerX,playerY);
-		frog1Label.setLocation(frog1.getX(), frog1.getY());
+	public void UpdateFrog1() {
+		DetectBorder(DataScore.INSTANCE.GetX(),DataScore.INSTANCE.GetY());
+		frog1Label.setLocation(frog1.getX()+DataScore.INSTANCE.GetX(), frog1.getY()+DataScore.INSTANCE.GetY());
 		
 	}
 
