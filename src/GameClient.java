@@ -8,9 +8,10 @@ public class GameClient implements Runnable {
 
 	private Socket s;
 	private Scanner in;
-
-	public GameClient (Socket aSocket) {
+	private Frog1 frog;
+	public GameClient (Socket aSocket, Frog1 frog1) {
 		this.s = aSocket;
+		this.frog = frog1;
 	}
 	public void run() {
 		
@@ -44,13 +45,30 @@ public class GameClient implements Runnable {
 	}
 	public void executeCommand(String command) throws IOException{
 		if ( command.equals("VERT")) {
-			int speed = in.nextInt();
-			System.out.println("SOUP" + speed);
-			DataScore.INSTANCE.SetY(speed);
+			int speed = 0;
+			String direction = in.next();
+			switch(direction) {
+			case "U":
+				speed += 90;
+				break;
+			case "D":
+				speed -= 90;
+				break;
+			}
+			this.frog.setY(speed);
 		} else if (command.equals("SIDE")) {
-			int speed = in.nextInt();
-			System.out.println("PIZZA" + speed);
-			DataScore.INSTANCE.SetX(speed);
+			String direction = in.next();
+			int speed = 0;
+			switch(direction) {
+			case "L":
+				speed += 90;
+				break;
+			case "R":
+				speed -= 90;
+				break;
+			}
+			this.frog.setX(speed);
+			
 		}
 	}
 }

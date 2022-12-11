@@ -77,7 +77,7 @@ public class FroggerClient extends JFrame implements KeyListener {
 							Socket s2;
 							try {
 								s2 = client.accept();
-								GameClient myService = new GameClient (s2);
+								GameClient myService = new GameClient (s2, frog1);
 								Thread t = new Thread(myService);
 								t.start();
 								
@@ -224,25 +224,25 @@ public class FroggerClient extends JFrame implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-		int x = frog1.getX(); int y = frog1.getY();
 		if (frog1.getMoving() == true) {
 		//modify position
 		String command = null;
 		if (e.getKeyCode() == KeyEvent.VK_UP) {
-			command = "VERT 90";
+			command = "VERT U ";
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-			command = "VERT 90";
+			command = "VERT D ";
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			command = "SIDE 41";
+			command = "SIDE L ";
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			command = "SIDE 41";
+			command = "SIDE R ";
 
 		} else {
 			System.out.println("invalid operation");
 		}
+		
 		out.println(command);
 		out.flush();
-		UpdateFrog1();
+		frog1Label.setLocation(frog1.getX(), frog1.getY());
 		}
 }
 	@Override
